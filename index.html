@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rapat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="meeting-info">
+      <span id="timer" class="timer">00:00</span>
+      <span class="title-sep"></span>
+      <span id="meetingTitle" class="meeting-title"></span>
+    </div>
+    <nav class="toolbar">
+      <button class="tb-btn" id="btnChat" data-icon="chat" title="Obrolan (playlist)"><span>Obrolan</span></button>
+      <button class="tb-btn" id="btnPeople" data-icon="people" title="Peserta"><span>Orang</span><b id="peopleBadge" class="badge"></b></button>
+      <button class="tb-btn" id="btnHand" data-icon="hand" title="Angkat tangan"><span>Angkat</span></button>
+      <div class="react-wrap">
+        <button class="tb-btn" id="btnReact" data-icon="react" title="Bereaksi"><span>Bereaksi</span></button>
+        <div id="reactMenu" class="react-menu" hidden>
+          <button data-emoji="👍">👍</button>
+          <button data-emoji="❤️">❤️</button>
+          <button data-emoji="😆">😆</button>
+          <button data-emoji="😮">😮</button>
+          <button data-emoji="👏">👏</button>
+          <button data-emoji="🎉">🎉</button>
+        </div>
+      </div>
+      <button class="tb-btn" id="btnView" data-icon="view" title="Ganti tampilan"><span>Tampilan</span></button>
+      <button class="tb-btn" id="btnMore" data-icon="more" title="Pengaturan rapat"><span>Lainnya</span></button>
+      <div class="tb-sep"></div>
+      <button class="tb-btn" id="btnCam" data-icon="camOff" title="Kamera"><span>Kamera</span></button>
+      <button class="tb-btn" id="btnMic" data-icon="mic" title="Bisukan suara (Ctrl+Shift+M)"><span>Mikrofon</span></button>
+      <button class="tb-btn" id="btnShare" data-icon="share" title="Bagikan MP3"><span>Bagikan</span></button>
+      <button class="leave-btn" id="btnLeave" data-icon="phone" title="Keluar rapat"><span>Keluar</span></button>
+    </nav>
+  </header>
+
+  <div class="main">
+    <section class="stage-wrap">
+      <div id="stage" class="stage"></div>
+      <div id="ytHost" class="yt-host parked"><div id="ytFrame"></div></div>
+      <div id="selfTile" class="tile self-tile"></div>
+      <div id="captions" class="captions" hidden></div>
+      <div id="emojiLayer" class="emoji-layer"></div>
+
+      <footer class="player">
+        <div class="np">
+          <div id="npAvatar" class="np-avatar"></div>
+          <div class="np-text">
+            <div id="npTitle" class="np-title"></div>
+            <div id="npSub" class="np-sub"></div>
+          </div>
+        </div>
+        <div class="controls">
+          <div class="ctrl-row">
+            <button class="pbtn" id="btnShuffle" data-icon="shuffle" title="Acak"></button>
+            <button class="pbtn" id="btnPrev" data-icon="prev" title="Sebelumnya"></button>
+            <button class="pbtn play" id="btnPlay" data-icon="play" title="Putar / Jeda (Spasi)"></button>
+            <button class="pbtn" id="btnNext" data-icon="next" title="Berikutnya"></button>
+            <button class="pbtn" id="btnRepeat" data-icon="repeat" title="Ulangi"></button>
+          </div>
+          <div class="seek-row">
+            <span id="tCur" class="t">0:00</span>
+            <input type="range" id="seek" class="range" min="0" max="0" step="0.1" value="0">
+            <span id="tDur" class="t">0:00</span>
+          </div>
+        </div>
+        <div class="vol">
+          <button class="pbtn" id="btnVideo" data-icon="yt" title="Tampilkan video YouTube" hidden></button>
+          <button class="pbtn" id="btnVol" data-icon="volume" title="Bisukan"></button>
+          <input type="range" id="vol" class="range" min="0" max="1" step="0.01">
+        </div>
+      </footer>
+    </section>
+
+    <aside id="side" class="side" hidden>
+      <div class="side-view" data-view="chat">
+        <div class="side-head">
+          <h2>Obrolan rapat</h2>
+          <button class="icon-btn" data-act="close-panel" data-icon="close" title="Tutup"></button>
+        </div>
+        <div class="tabs">
+          <button class="tab" data-act="tab" data-tab="list">Playlist</button>
+          <button class="tab" data-act="tab" data-tab="yt">Cari YouTube</button>
+        </div>
+        <div class="tab-body" data-tab="list">
+          <div id="playlist" class="playlist"></div>
+          <div class="side-foot">
+            <button class="primary-btn" data-act="add-songs" data-icon="plus"><span>Bagikan MP3</span></button>
+          </div>
+        </div>
+        <div class="tab-body" data-tab="yt">
+          <form id="ytForm" class="yt-form">
+            <input id="ytQuery" placeholder="Cari lagu di YouTube…" autocomplete="off">
+            <button class="primary-btn" type="submit">Cari</button>
+          </form>
+          <div id="ytResults" class="yt-results"></div>
+        </div>
+      </div>
+      <div class="side-view" data-view="people">
+        <div class="side-head">
+          <h2>Peserta</h2>
+          <button class="icon-btn" data-act="close-panel" data-icon="close" title="Tutup"></button>
+        </div>
+        <div class="side-actions">
+          <button class="primary-btn" data-act="add-person" data-icon="plus"><span>Tambah peserta</span></button>
+        </div>
+        <div class="section-label">Dalam rapat ini (<span id="peopleCount"></span>)</div>
+        <div id="peopleList" class="people-list"></div>
+      </div>
+    </aside>
+  </div>
+
+  <input type="file" id="fileSongs" accept="audio/*,.mp3" multiple hidden>
+  <input type="file" id="filePhoto" accept="image/*" hidden>
+
+  <div id="personModal" class="modal" hidden>
+    <div class="dialog">
+      <h3 id="pmTitle">Tambah peserta</h3>
+      <div class="pm-photo">
+        <div id="pmAvatar" class="pm-avatar"></div>
+        <div class="pm-photo-btns">
+          <button class="secondary-btn" data-act="pick-photo">Unggah foto</button>
+          <button class="secondary-btn" data-act="clear-photo">Hapus foto</button>
+        </div>
+      </div>
+      <details id="pmBadge" class="badge-maker">
+        <summary>Buat foto lencana dari teks</summary>
+        <div class="badge-grid">
+          <label class="field">Teks besar
+            <input id="bmBig" maxlength="12" placeholder="mis. SUN" autocomplete="off">
+          </label>
+          <label class="field">Teks kecil
+            <input id="bmSmall" maxlength="20" placeholder="mis. EVELYN" autocomplete="off">
+          </label>
+          <label class="field">Label lonjong
+            <input id="bmTag" maxlength="8" placeholder="mis. SBM" autocomplete="off">
+          </label>
+          <label class="field">Warna
+            <input id="bmColor" type="color" value="#1565c0">
+          </label>
+        </div>
+      </details>
+      <label class="field">Nama
+        <input id="pmName" maxlength="40" placeholder="mis. Rina Wijaya" autocomplete="off">
+      </label>
+      <div class="field">Warna latar inisial
+        <div id="pmColors" class="swatches"></div>
+      </div>
+      <label class="check"><input type="checkbox" id="pmVideo"> Kamera nyala (foto tampil penuh seperti video)</label>
+      <div class="dialog-btns">
+        <button class="secondary-btn" data-act="close-modal">Batal</button>
+        <button class="primary-btn" data-act="save-person">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="settingsModal" class="modal" hidden>
+    <div class="dialog">
+      <h3>Pengaturan rapat</h3>
+      <label class="field">Judul rapat
+        <input id="smTitle" maxlength="60" autocomplete="off">
+      </label>
+      <label class="field">YouTube API key
+        <input id="smKey" autocomplete="off" spellcheck="false" placeholder="AIza…">
+        <span class="hint">Buat gratis di <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" rel="noopener">Google Cloud Console</a>: aktifkan <b>YouTube Data API v3</b>, lalu Credentials → Create credentials → API key.</span>
+      </label>
+      <div class="dialog-danger">
+        <button class="secondary-btn" data-act="clear-songs">Hapus semua lagu</button>
+        <button class="secondary-btn" data-act="reset-people">Reset peserta</button>
+      </div>
+      <div class="dialog-btns">
+        <button class="secondary-btn" data-act="close-modal">Batal</button>
+        <button class="primary-btn" data-act="save-settings">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="leftScreen" class="left-screen" hidden>
+    <div class="left-card">
+      <h2>Anda telah meninggalkan rapat</h2>
+      <p id="leftInfo"></p>
+      <button class="primary-btn" data-act="rejoin">Gabung kembali</button>
+    </div>
+  </div>
+
+  <div id="dropOverlay" class="drop-overlay" hidden>Lepaskan untuk membagikan MP3 ke rapat</div>
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
